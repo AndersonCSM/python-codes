@@ -1,4 +1,4 @@
-# Python_codes
+# PythonCodes
 
 Códigos e exercícios na linguagem de programação Python, muitos exercícios vêm de cursos e materiais da internet, outros da graduação e muitos mais da vontade de explorar a linguagem.
 ---
