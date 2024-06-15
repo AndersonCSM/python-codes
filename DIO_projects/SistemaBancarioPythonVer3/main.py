@@ -1,3 +1,15 @@
+"""
+Projeto de um sistema bancário versão 3
+
+Nessa versão do projetos além dos arquivos serem reorganizados em projetos diferentes, o usuário precisa logar em uma conta para fazer
+movimentações bancárias, para isso é preciso seguir o passo a passo abaixo:
+
+1 -> cadastrar usuário
+2 -> cadastrar conta para usuário
+3 -> entrar na conta
+"""
+
+
 from caixa import login, criar_conta, criar_cliente, listar_contas
 from caixa import menu, depositar, sacar, exibir_extrato
 
