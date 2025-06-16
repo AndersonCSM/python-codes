@@ -106,7 +106,7 @@ def run_client(host="127.0.0.1", port=65432):
         print("Cliente desconectado.")
 
 
-if __name__ == "__main__":  # tratamento para liberar permissões ao compilador
+if __name__ == "__main__":  # tratamento para liberar permissões
     if len(sys.argv) < 2:  # maneira intuitiva de mostrar ao usuário como utilizar o código
         print("Uso: python main.py [server|client]")
         print("Exemplo para iniciar o servidor: python main.py server")
