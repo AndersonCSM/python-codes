@@ -10,8 +10,8 @@ in_index = 0
 out_index = 0
 count = 0
 
-# Vari�veis do Algoritmo de Peterson
-N = 2  # N�mero de threads (0 para produtor, 1 para consumidor)
+# Variaveis do Algoritmo de Peterson
+N = 2  # Numero de threads (0 para produtor, 1 para consumidor)
 flag = [False] * N  # Sinalizadores para indicar prontidao
 turn = 0  # Variavel para indicar a vez
 
@@ -88,7 +88,7 @@ def consumer_thread_func():
             print(f"Consumidor: Buffer vazio, esperando... (Buffer: {count}/{BUFFER_SIZE})")
 
         flag[C_ID] = False  # Consumidor saiu da secao critica
-        
+
         # Seção Restante: Ações adicionais após a seção crítica
         # Se o buffer estava vazio, uma pequena pausa antes de tentar novamente
         if count == 0:
