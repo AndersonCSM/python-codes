@@ -5,27 +5,58 @@ import random
 # Lista com os elementos
 BUFFER_SIZE = 5
 buffer = []
-mutex = 0  # 0 = livre, 1 = ocupado
+
+# Semáforos simulados
+empty = BUFFER_SIZE  # conta os espaços vazios no buffer
+full = 0  # conta os itens disponíveis no buffer
+mutex = 1  # controla o acesso exclusivo à seção crítica
 
 # Numero de itens a serem produzidos/consumidos antes de terminar
 TOT_ITEMS = 10
 producer_items = 0
 consumer_items = 0
 
+# Lock para proteger operações sobre os semáforos (simula atomicidade)
+semaphore_lock = threading.Lock()
 
-def mutex_lock():
-    global mutex
+
+# Implementação de wait (P) com espera ativa
+def wait(sem_name):
+    """
+    Operação de espera (decrementa o semáforo).
+    Bloqueia a thread se o valor do semáforo for 0.
+    """
+
+    global empty, full, mutex
     while True:
-        if mutex == 0:
-            mutex = 1  # tranca o recurso
-            return
-        else:
-            time.sleep(0.01)  # espera até o mutex ficar livre
+        # AQUI usamos o lock para garantir que a leitura e o decremento sejam atômicos
+        with semaphore_lock:  # Verifica qual semáforo deve ser 'esperado' (waited)
+            if sem_name == "empty" and empty > 0:
+                empty -= 1
+                return
+            elif sem_name == "full" and full > 0:
+                full -= 1
+                return
+            elif sem_name == "mutex" and mutex > 0:
+                mutex -= 1
+                return
+        time.sleep(0.001)  # espera ativa leve
 
 
-def mutex_unlock():
-    global mutex
-    mutex = 0  # libera o recurso
+# Implementação de signal (V)
+def signal(sem_name):
+    """
+    Operação de sinalização (incrementa o semáforo).
+    """
+
+    global empty, full, mutex
+    with semaphore_lock:
+        if sem_name == "empty":
+            empty += 1
+        elif sem_name == "full":
+            full += 1
+        elif sem_name == "mutex":
+            mutex += 1
 
 
 # Funcao para a thread produtora
@@ -37,7 +68,8 @@ def producer_thread_func():
         item = random.randint(1, 100)  # Produz um item aleatorio
 
         # entrada na seção crítica
-        mutex_lock()
+        wait("empty")  # espera por espaço disponível
+        wait("mutex")  # espera pelo acesso exclusivo ao buffer
 
         try:
             # Secao Critica: Produtor produz um item e o coloca no buffer
@@ -51,8 +83,10 @@ def producer_thread_func():
                 print(f"Produtor: Buffer cheio, esperando... (Buffer: {size}/{BUFFER_SIZE})")
 
         finally:
-            # saida da seção crítica
-            mutex_unlock()
+            # Saída da seção crítica
+            # A ordem é importante: libere o mutex ANTES de sinalizar o semáforo.
+            signal("mutex")  # libera o acesso ao buffer
+            signal("full")  # sinaliza que há um novo item no buffer
 
         # Seção Restante: Ações adicionais após a seção crítica
         # Se o buffer estava cheio, uma pequena pausa antes de tentar novamente
@@ -70,8 +104,9 @@ def consumer_thread_func():
 
     while consumer_items < TOT_ITEMS:
 
-        # entrada na seção crítica
-        mutex_lock()
+        # Entrada na seção crítica
+        wait("full")  # espera por item disponível
+        wait("mutex")  # espera pelo acesso exclusivo ao buffer
 
         try:
             size = len(buffer)
@@ -85,8 +120,10 @@ def consumer_thread_func():
                 print(f"Consumidor: Buffer vazio, esperando... (Buffer: {size}/{BUFFER_SIZE})")
 
         finally:
-            # saida da seção crítica
-            mutex_unlock()
+            # Saída da seção crítica
+            # A ordem é importante: libere o mutex ANTES de sinalizar o semáforo.
+            signal("mutex")  # libera o acesso ao buffer
+            signal("empty")  # sinaliza que há espaço livre no buffer
 
         # Seção Restante: Ações adicionais após a seção crítica
         # Se o buffer estava vazio, uma pequena pausa antes de tentar novamente
