@@ -28,7 +28,9 @@ def producer_thread_func():
 
     while producer_items < TOT_ITEMS:
         item = random.randint(1, 100)  # Produz um item aleatorio
-        flag[P_ID] = True  # Produtor esta pronto para produzir
+
+        # Produtor esta pronto para produzir
+        flag[P_ID] = True
         # Python permite modificar objetos mutaveis (listas) de um escopo superior sem a palavra-chave global
         turn = C_ID  # Da a vez ao consumidor
 
@@ -63,7 +65,9 @@ def consumer_thread_func():
     global buffer, turn, consumer_items
 
     while consumer_items < TOT_ITEMS:
-        flag[C_ID] = True  # Consumidor esta pronto para consumir
+
+        # Consumidor esta pronto para consumir
+        flag[C_ID] = True
         # Python permite modificar objetos mutaveis (listas) de um escopo superior sem a palavra-chave global.
         turn = P_ID  # Da a vez ao produtor
         while flag[P_ID] and turn == P_ID:  # Espera a vez do consumidor
